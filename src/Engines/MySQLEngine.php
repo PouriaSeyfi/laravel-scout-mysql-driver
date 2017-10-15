@@ -48,14 +48,16 @@ class MySQLEngine extends Engine
 
             return $result;
         }
-
-        $mode = $this->shouldUseFallback($builder) ? $this->fallbackMode : $this->mode;
-
-        $whereRawString = $mode->buildWhereRawString($builder);
-        $params = $mode->buildParams($builder);
-
+        
         $model = $builder->model;
-        $query = $model::whereRaw($whereRawString, $params);
+        if (($builder->query === "0") || !empty($builder->query)){
+            $mode = $this->shouldUseFallback($builder) ? $this->fallbackMode : $this->mode;
+            $whereRawString = $mode->buildWhereRawString($builder);
+            $params = $mode->buildParams($builder);
+            $query = $model::whereRaw($whereRawString, $params);
+        }else{
+            $query = $model::query();
+        }
 
         $result['count'] = $query->count();
 
